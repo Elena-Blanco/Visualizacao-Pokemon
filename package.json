@@ -1,0 +1,23 @@
+{
+  "name": "pokemon-data-visualization",
+  "version": "1.0.0",
+  "description": "Sistema de análise visual de dados Pokémon usando D3.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server -c-1 ."
+  },
+  "keywords": [
+    "pokemon",
+    "d3.js",
+    "data visualization",
+    "javascript"
+  ],
+  "author": "Manus AI",
+  "license": "MIT",
+  "dependencies": {
+    "d3": "^7.8.5"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
