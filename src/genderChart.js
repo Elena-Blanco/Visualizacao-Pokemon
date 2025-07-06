@@ -1,16 +1,9 @@
-/**
- * Visualização: Porcentagem de Sexualidade dos Pokémon
- */
-
 function createGenderChart(data, filters) {
-    // Limpar o container
     const container = d3.select('#gender-chart');
     container.html('');
-    
-    // Filtrar os dados
+
     const filteredData = filterData(data, filters);
-    
-    // Processar os dados para a visualização
+
     const genderCategories = [
         { name: 'Apenas Macho', range: [100, 100], color: '#6890F0' },
         { name: 'Maioria Macho', range: [66.7, 99.9], color: '#98D8D8' },
@@ -19,8 +12,7 @@ function createGenderChart(data, filters) {
         { name: 'Apenas Fêmea', range: [0, 0], color: '#EE99AC' },
         { name: 'Sem Gênero', range: [-1, -1], color: '#B8B8D0' }
     ];
-    
-    // Classificar os Pokémon por categoria de gênero
+
     const genderData = genderCategories.map(category => {
         let pokemonInCategory;
         
@@ -41,32 +33,27 @@ function createGenderChart(data, filters) {
             color: category.color
         };
     });
-    
-    // Calcular porcentagens
+
     const total = d3.sum(genderData, d => d.count);
     genderData.forEach(d => {
         d.percentage = (d.count / total) * 100;
     });
-    
-    // Configurar dimensões
+
     const margin = {top: 30, right: 30, bottom: 30, left: 30};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
     const radius = Math.min(width, height) / 2;
-    
-    // Criar SVG
+
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${width / 2 + margin.left},${height / 2 + margin.top})`);
-    
-    // Criar escala de cores
+
     const color = d3.scaleOrdinal()
         .domain(genderData.map(d => d.category))
         .range(genderData.map(d => d.color));
-    
-    // Criar gerador de arcos para o gráfico de pizza
+
     const pie = d3.pie()
         .value(d => d.count)
         .sort(null);
@@ -78,11 +65,9 @@ function createGenderChart(data, filters) {
     const outerArc = d3.arc()
         .innerRadius(radius * 0.9)
         .outerRadius(radius * 0.9);
-    
-    // Criar tooltip
+
     const tooltip = createTooltip();
-    
-    // Criar arcos
+
     const arcs = svg.selectAll('.arc')
         .data(pie(genderData))
         .enter()
@@ -102,8 +87,7 @@ function createGenderChart(data, filters) {
             `, event);
         })
         .on('mouseout', () => hideTooltip(tooltip));
-    
-    // Adicionar rótulos
+
     const text = svg.selectAll('.label')
         .data(pie(genderData))
         .enter()
@@ -114,8 +98,7 @@ function createGenderChart(data, filters) {
     function midAngle(d) {
         return d.startAngle + (d.endAngle - d.startAngle) / 2;
     }
-    
-    // Posicionar rótulos com linhas de conexão
+
     text.attr('transform', function(d) {
         const pos = outerArc.centroid(d);
         pos[0] = radius * (midAngle(d) < Math.PI ? 1.1 : -1.1);
@@ -129,8 +112,7 @@ function createGenderChart(data, filters) {
         return `${d.data.category} (${d.data.percentage.toFixed(1)}%)`;
     })
     .style('font-size', '12px');
-    
-    // Adicionar linhas de conexão
+
     const polyline = svg.selectAll('.polyline')
         .data(pie(genderData))
         .enter()
@@ -146,8 +128,7 @@ function createGenderChart(data, filters) {
     .style('fill', 'none')
     .style('stroke', '#999')
     .style('stroke-width', '1px');
-    
-    // Adicionar título
+
     svg.append('text')
         .attr('class', 'chart-title')
         .attr('text-anchor', 'middle')

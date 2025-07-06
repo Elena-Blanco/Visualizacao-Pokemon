@@ -1,12 +1,6 @@
-/**
- * Carregador de dados para o sistema de visualização de dados Pokémon
- */
-
-// Função para carregar e processar os dados
 async function loadData() {
     try {
         const data = await d3.csv('data/pokedex_(Update_05.20).csv', d => {
-            // Converter strings para números onde necessário
             return {
                 pokedex_number: +d.pokedex_number,
                 name: d.name,
@@ -31,12 +25,10 @@ async function loadData() {
 
         console.log('Dados carregados:', data.length, 'Pokémon');
         
-        // Extrair valores únicos para os filtros
         const generations = [...new Set(data.map(d => d.generation))].sort((a, b) => a - b);
         const types = [...new Set([...data.map(d => d.type_1), ...data.map(d => d.type_2).filter(t => t)])].sort();
         const statuses = [...new Set(data.map(d => d.status))].sort();
-        
-        // Preencher os dropdowns de filtro
+
         populateFilterDropdown('generation-filter', generations);
         populateFilterDropdown('type-filter', types);
         populateFilterDropdown('status-filter', statuses);
@@ -48,18 +40,14 @@ async function loadData() {
     }
 }
 
-// Função para preencher um dropdown de filtro
 function populateFilterDropdown(id, values) {
     const dropdown = document.getElementById(id);
-    
-    // Manter a opção "Todas/Todos"
+
     const allOption = dropdown.options[0];
-    
-    // Limpar outras opções existentes
+
     dropdown.innerHTML = '';
     dropdown.appendChild(allOption);
-    
-    // Adicionar novas opções
+
     values.forEach(value => {
         const option = document.createElement('option');
         option.value = value;

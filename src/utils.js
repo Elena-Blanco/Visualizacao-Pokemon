@@ -1,8 +1,3 @@
-/**
- * Utilitários para o sistema de visualização de dados Pokémon
- */
-
-// Cores para os tipos de Pokémon
 const TYPE_COLORS = {
     'Normal': '#A8A878',
     'Fire': '#F08030',
@@ -24,7 +19,6 @@ const TYPE_COLORS = {
     'Fairy': '#EE99AC'
 };
 
-// Função para criar um tooltip
 function createTooltip() {
     return d3.select('body')
         .append('div')
@@ -32,7 +26,6 @@ function createTooltip() {
         .style('opacity', 0);
 }
 
-// Função para mostrar o tooltip
 function showTooltip(tooltip, html, event) {
     tooltip
         .html(html)
@@ -43,7 +36,6 @@ function showTooltip(tooltip, html, event) {
         .style('opacity', 0.9);
 }
 
-// Função para esconder o tooltip
 function hideTooltip(tooltip) {
     tooltip
         .transition()
@@ -51,39 +43,32 @@ function hideTooltip(tooltip) {
         .style('opacity', 0);
 }
 
-// Função para calcular a força total de um Pokémon (soma de todos os status)
 function calculateTotalStrength(pokemon) {
     return pokemon.hp + pokemon.attack + pokemon.defense + 
            pokemon.sp_attack + pokemon.sp_defense + pokemon.speed;
 }
 
-// Função para calcular a força ofensiva de um Pokémon
 function calculateOffensiveStrength(pokemon) {
     return pokemon.attack + pokemon.sp_attack + pokemon.speed;
 }
 
-// Função para calcular a força defensiva de um Pokémon
 function calculateDefensiveStrength(pokemon) {
     return pokemon.hp + pokemon.defense + pokemon.sp_defense;
 }
 
-// Função para obter a cor de um tipo
 function getTypeColor(type) {
     return TYPE_COLORS[type] || '#999999';
 }
 
-// Função para criar um badge HTML para um tipo
 function createTypeBadge(type) {
     return `<span class="type-badge" style="background-color: ${getTypeColor(type)}">${type}</span>`;
 }
 
-// Função para truncar texto longo
 function truncateText(text, maxLength = 20) {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength - 3) + '...';
 }
 
-// Função para filtrar os dados com base nos filtros selecionados
 function filterData(data, filters) {
     return data.filter(d => {
         let matchesGeneration = filters.generation === 'all' || d.generation == filters.generation;
@@ -94,12 +79,10 @@ function filterData(data, filters) {
     });
 }
 
-// Função para atualizar todos os gráficos
 function updateAllCharts() {
     // Esta função será definida no main.js
 }
 
-// Função para criar uma legenda
 function createLegend(container, items, colorScale) {
     const legend = container.append('div')
         .attr('class', 'legend');
@@ -117,7 +100,6 @@ function createLegend(container, items, colorScale) {
     });
 }
 
-// Função para determinar a categoria do Pokémon com base no status
 function getPokemonCategory(pokemon) {
     if (pokemon.status.includes('Legendary')) {
         return 'Lendário';
@@ -130,7 +112,6 @@ function getPokemonCategory(pokemon) {
     }
 }
 
-// Função para formatar números com separadores de milhares
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }

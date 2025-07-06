@@ -1,15 +1,9 @@
-/**
- * Arquivo principal para o sistema de visualização de dados Pokémon
- */
-
-// Estado global para os filtros
 const filters = {
     generation: 'all',
     type: 'all',
     status: 'all'
 };
 
-// Função para atualizar todos os gráficos
 function updateAllCharts(data) {
     createTypesByGenerationChart(data, filters);
     createAvgStrengthByTypeChart(data, filters);
@@ -21,27 +15,22 @@ function updateAllCharts(data) {
     createStrongestPokemonChart(data, filters);
 }
 
-// Função para configurar os eventos dos filtros
 function setupFilterEvents(data) {
-    // Filtro de geração
     document.getElementById('generation-filter').addEventListener('change', function() {
         filters.generation = this.value;
         updateAllCharts(data);
     });
     
-    // Filtro de tipo
     document.getElementById('type-filter').addEventListener('change', function() {
         filters.type = this.value;
         updateAllCharts(data);
     });
-    
-    // Filtro de status
+
     document.getElementById('status-filter').addEventListener('change', function() {
         filters.status = this.value;
         updateAllCharts(data);
     });
-    
-    // Botão de reset
+
     document.getElementById('reset-filters').addEventListener('click', function() {
         document.getElementById('generation-filter').value = 'all';
         document.getElementById('type-filter').value = 'all';
@@ -55,7 +44,6 @@ function setupFilterEvents(data) {
     });
 }
 
-// Função principal
 async function main() {
     try {
         console.log('Carregando dados...');
@@ -79,6 +67,4 @@ async function main() {
     }
 }
 
-// Iniciar o sistema quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', main);
-

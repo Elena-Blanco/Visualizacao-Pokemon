@@ -1,24 +1,16 @@
-/**
- * Visualização: Tipos de Pokémon por Geração
- */
-
 function createTypesByGenerationChart(data, filters) {
-    // Limpar o container
     const container = d3.select('#types-by-generation-chart');
     container.html('');
-    
-    // Filtrar os dados
+
     const filteredData = filterData(data, filters);
-    
-    // Processar os dados para a visualização
+
     const typesByGeneration = d3.rollup(
         filteredData,
         v => v.length,
         d => d.generation,
         d => d.type_1
     );
-    
-    // Converter para formato adequado para visualização
+
     const chartData = [];
     typesByGeneration.forEach((typeMap, generation) => {
         typeMap.forEach((count, type) => {
@@ -29,24 +21,20 @@ function createTypesByGenerationChart(data, filters) {
             });
         });
     });
-    
-    // Agrupar por geração para empilhamento
+
     const generations = [...new Set(chartData.map(d => d.generation))].sort((a, b) => a - b);
     const types = [...new Set(chartData.map(d => d.type))].sort();
-    
-    // Configurar dimensões
+
     const margin = {top: 30, right: 30, bottom: 70, left: 60};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-    
-    // Criar SVG
+
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
     
-    // Criar escalas
     const x = d3.scaleBand()
         .domain(generations)
         .range([0, width])
@@ -60,7 +48,6 @@ function createTypesByGenerationChart(data, filters) {
         .domain(types)
         .range(types.map(type => getTypeColor(type)));
     
-    // Criar eixos
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x).tickFormat(d => `Gen ${d}`))
@@ -70,12 +57,11 @@ function createTypesByGenerationChart(data, filters) {
     svg.append('g')
         .call(d3.axisLeft(y));
     
-    // Adicionar título dos eixos
     svg.append('text')
         .attr('class', 'axis-title')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
-        .attr('y', height + margin.bottom - 10)
+        .attr('y', height + margin.bottom - 25)
         .text('Geração');
     
     svg.append('text')
@@ -86,10 +72,8 @@ function createTypesByGenerationChart(data, filters) {
         .attr('y', -margin.left + 15)
         .text('Quantidade de Pokémon');
     
-    // Criar tooltip
     const tooltip = createTooltip();
     
-    // Preparar dados para gráfico de barras empilhadas
     const stackedData = d3.stack()
         .keys(types)
         .value((data, key) => {
@@ -98,7 +82,6 @@ function createTypesByGenerationChart(data, filters) {
         })
         (generations.map(gen => ({generation: gen})));
     
-    // Criar barras empilhadas
     svg.append('g')
         .selectAll('g')
         .data(stackedData)
@@ -123,7 +106,5 @@ function createTypesByGenerationChart(data, filters) {
         })
         .on('mouseout', () => hideTooltip(tooltip));
     
-    // Criar legenda
     createLegend(container, types, color);
 }
-

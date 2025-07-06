@@ -1,24 +1,16 @@
-/**
- * Visualização: Combinações de Tipos
- */
-
 function createTypeCombinationsChart(data, filters) {
-    // Limpar o container
     const container = d3.select('#type-combinations-chart');
     container.html('');
     
-    // Filtrar os dados
     const filteredData = filterData(data, filters);
     
-    // Processar os dados para a visualização
     const typeCombinations = d3.rollup(
-        filteredData.filter(d => d.type_2), // Filtrar apenas Pokémon com tipo secundário
+        filteredData.filter(d => d.type_2), 
         v => v.length,
         d => d.type_1,
         d => d.type_2
     );
-    
-    // Converter para formato adequado para visualização
+
     const chartData = [];
     typeCombinations.forEach((secondaryTypes, primaryType) => {
         secondaryTypes.forEach((count, secondaryType) => {
@@ -29,26 +21,21 @@ function createTypeCombinationsChart(data, filters) {
             });
         });
     });
-    
-    // Ordenar por contagem
+
     chartData.sort((a, b) => b.count - a.count);
-    
-    // Pegar as 15 combinações mais comuns
+
     const topCombinations = chartData.slice(0, 15);
-    
-    // Configurar dimensões
+
     const margin = {top: 30, right: 30, bottom: 100, left: 60};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-    
-    // Criar SVG
+
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
     
-    // Criar escalas
     const x = d3.scaleBand()
         .domain(topCombinations.map(d => `${d.primaryType}/${d.secondaryType}`))
         .range([0, width])
@@ -58,7 +45,6 @@ function createTypeCombinationsChart(data, filters) {
         .domain([0, d3.max(topCombinations, d => d.count)])
         .range([height, 0]);
     
-    // Criar eixos
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -69,7 +55,6 @@ function createTypeCombinationsChart(data, filters) {
     svg.append('g')
         .call(d3.axisLeft(y));
     
-    // Adicionar título dos eixos
     svg.append('text')
         .attr('class', 'axis-title')
         .attr('text-anchor', 'middle')
@@ -85,12 +70,9 @@ function createTypeCombinationsChart(data, filters) {
         .attr('y', -margin.left + 15)
         .text('Quantidade de Pokémon');
     
-    // Criar tooltip
     const tooltip = createTooltip();
     
-    // Criar barras com gradiente
     topCombinations.forEach((d, i) => {
-        // Criar gradiente
         const gradientId = `gradient-${i}`;
         const gradient = svg.append('defs')
             .append('linearGradient')
@@ -107,8 +89,7 @@ function createTypeCombinationsChart(data, filters) {
         gradient.append('stop')
             .attr('offset', '100%')
             .attr('stop-color', getTypeColor(d.secondaryType));
-        
-        // Criar barra
+
         svg.append('rect')
             .attr('class', 'bar')
             .attr('x', x(`${d.primaryType}/${d.secondaryType}`))
@@ -127,7 +108,6 @@ function createTypeCombinationsChart(data, filters) {
             .on('mouseout', () => hideTooltip(tooltip));
     });
     
-    // Adicionar informação sobre combinações raras
     const rareCombinations = chartData.slice(-5).reverse();
     
     const rareInfo = container.append('div')

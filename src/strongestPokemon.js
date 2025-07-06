@@ -1,15 +1,11 @@
-/**
- * Visualização: Pokémon Mais Forte por Tipo e Geração
- */
-
 function createStrongestPokemonChart(data, filters) {
     // Limpar o container
     const container = d3.select('#strongest-pokemon-chart');
     container.html('');
-    
+
     // Filtrar os dados
     const filteredData = filterData(data, filters);
-    
+
     // Encontrar o Pokémon mais forte por tipo e geração
     const strongestByTypeAndGen = d3.rollup(
         filteredData,
@@ -22,7 +18,7 @@ function createStrongestPokemonChart(data, filters) {
         d => d.type_1,
         d => d.generation
     );
-    
+
     // Converter para formato adequado para visualização
     const chartData = [];
     strongestByTypeAndGen.forEach((genMap, type) => {
@@ -36,56 +32,67 @@ function createStrongestPokemonChart(data, filters) {
             });
         });
     });
-    
+
     // Filtrar por geração selecionada
     let displayData = chartData;
     if (filters.generation !== 'all') {
         displayData = chartData.filter(d => d.generation == filters.generation);
     }
-    
+
     // Filtrar por tipo selecionado
     if (filters.type !== 'all') {
         displayData = displayData.filter(d => d.type === filters.type);
     }
-    
+
     // Ordenar por pontos totais
     displayData.sort((a, b) => b.total_points - a.total_points);
-    
+
     // Limitar a 15 itens para melhor visualização
     if (displayData.length > 15) {
         displayData = displayData.slice(0, 15);
     }
-    
-    // Configurar dimensões
-    const margin = {top: 30, right: 30, bottom: 70, left: 150};
+
+    // Configurar dimensões - Ajustado para acomodar o texto mais longo
+    const margin = {top: 30, right: 30, bottom: 70, left: 200};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-    
+
     // Criar SVG
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-    
+
     // Criar escalas
     const x = d3.scaleLinear()
         .domain([0, d3.max(displayData, d => d.total_points)])
         .range([0, width]);
-    
+
     const y = d3.scaleBand()
-        .domain(displayData.map(d => d.name))
+        .domain(displayData.map(d => d.name)) 
         .range([0, height])
         .padding(0.2);
-    
+
     // Criar eixos
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x));
-    
+
     svg.append('g')
-        .call(d3.axisLeft(y));
-    
+        .call(d3.axisLeft(y)
+            .tickFormat(d => {
+                // Encontra os dados completos do Pokémon para pegar a geração
+                const pokemonData = displayData.find(p => p.name === d);
+                if (pokemonData) {
+                    return `${pokemonData.name} (Gen ${pokemonData.generation})`;
+                }
+                return d;
+            })
+        )
+        .selectAll('text')
+        .style('text-anchor', 'end'); // Garante que o texto esteja alinhado à direita do tick
+
     // Adicionar título dos eixos
     svg.append('text')
         .attr('class', 'axis-title')
@@ -93,15 +100,14 @@ function createStrongestPokemonChart(data, filters) {
         .attr('x', width / 2)
         .attr('y', height + margin.bottom - 30)
         .text('Pontos Totais');
-    
+
     // Criar tooltip
     const tooltip = createTooltip();
-    
+
     // Criar barras com gradiente para Pokémon com tipo secundário
     displayData.forEach((d, i) => {
-        // Determinar a cor da barra
         let fill;
-        
+
         if (d.type_2) {
             // Criar gradiente para Pokémon com tipo secundário
             const gradientId = `strongest-gradient-${i}`;
@@ -112,21 +118,20 @@ function createStrongestPokemonChart(data, filters) {
                 .attr('y1', '0%')
                 .attr('x2', '100%')
                 .attr('y2', '0%');
-            
+
             gradient.append('stop')
                 .attr('offset', '0%')
                 .attr('stop-color', getTypeColor(d.type));
-            
+
             gradient.append('stop')
                 .attr('offset', '100%')
                 .attr('stop-color', getTypeColor(d.type_2));
-            
+
             fill = `url(#${gradientId})`;
         } else {
-            // Cor única para Pokémon com apenas um tipo
             fill = getTypeColor(d.type);
         }
-        
+
         // Criar barra
         svg.append('rect')
             .attr('class', 'bar')
@@ -145,7 +150,7 @@ function createStrongestPokemonChart(data, filters) {
             })
             .on('mouseout', () => hideTooltip(tooltip));
     });
-    
+
     // Adicionar rótulos nas barras
     svg.selectAll('.bar-label')
         .data(displayData)
@@ -156,19 +161,5 @@ function createStrongestPokemonChart(data, filters) {
         .attr('y', d => y(d.name) + y.bandwidth() / 2)
         .attr('dy', '.35em')
         .text(d => d.total_points);
-    
-    // Adicionar indicadores de geração
-    svg.selectAll('.generation-indicator')
-        .data(displayData)
-        .enter()
-        .append('text')
-        .attr('class', 'generation-indicator')
-        .attr('x', -20)
-        .attr('y', d => y(d.name) + y.bandwidth() / 2)
-        .attr('dy', '.35em')
-        .attr('text-anchor', 'end')
-        .text(d => `Gen ${d.generation}`)
-        .style('font-size', '10px')
-        .style('fill', '#666');
-}
 
+}
