@@ -121,6 +121,14 @@ body {
     overflow: hidden;
 }
 
+.col-md-12 > .card:has(.legend) {
+    height: 545px !important;
+}
+.card:has(.rare-combinations-info) {
+    height: 650px !important;
+}
+
+
 .card-header {
     background-color: #6890F0;
     color: white;
