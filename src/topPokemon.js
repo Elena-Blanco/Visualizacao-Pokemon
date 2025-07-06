@@ -1,9 +1,10 @@
 function createTopPokemonChart(data, filters, mode = 'offensive') {
+
     const container = d3.select('#top-pokemon-chart');
     container.html('');
-
+    
     const filteredData = filterData(data, filters);
-
+    
     let strengthFunction;
     let strengthLabel;
     
@@ -20,20 +21,23 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
         strength: strengthFunction(d)
     }));
     
+    
     const topPokemon = dataWithStrength
         .sort((a, b) => b.strength - a.strength)
         .slice(0, 10);
-
+    
+    
     const margin = {top: 30, right: 30, bottom: 70, left: 150};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-
+    
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-
+    
+    
     const x = d3.scaleLinear()
         .domain([0, d3.max(topPokemon, d => d.strength)])
         .range([0, width]);
@@ -46,14 +50,16 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
     const color = d3.scaleOrdinal()
         .domain(topPokemon.map(d => d.type_1))
         .range(topPokemon.map(d => getTypeColor(d.type_1)));
-
+    
+    
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x));
     
     svg.append('g')
         .call(d3.axisLeft(y));
-
+    
+    
     svg.append('text')
         .attr('class', 'axis-title')
         .attr('text-anchor', 'middle')
@@ -62,7 +68,7 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
         .text(strengthLabel);
 
     const tooltip = createTooltip();
-
+    
     svg.selectAll('.bar')
         .data(topPokemon)
         .enter()
@@ -72,7 +78,7 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
         .attr('y', d => y(d.name))
         .attr('width', d => x(d.strength))
         .attr('height', y.bandwidth())
-        .attr('fill', d => color(d.type_1))
+        .attr("fill", d => getTypeColor(d.type_1))
         .on('mouseover', function(event, d) {
             showTooltip(tooltip, `
                 <strong>${d.name}</strong><br>
@@ -112,4 +118,3 @@ function setupTopPokemonButtons(data, filters) {
         createTopPokemonChart(data, filters, 'defensive');
     });
 }
-
