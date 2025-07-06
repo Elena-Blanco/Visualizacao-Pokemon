@@ -49,7 +49,7 @@ function createStrongestPokemonChart(data, filters) {
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
 
     const svg = container.append('svg')
-        .attr('width', width + margin.left + margin.right)
+        .attr('width', (width + margin.left + margin.right + 100))
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
