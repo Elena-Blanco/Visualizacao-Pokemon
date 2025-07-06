@@ -1,16 +1,9 @@
-/**
- * Visualização: Top 10 Pokémon Ofensivos e Defensivos
- */
-
 function createTopPokemonChart(data, filters, mode = 'offensive') {
-    // Limpar o container
     const container = d3.select('#top-pokemon-chart');
     container.html('');
-    
-    // Filtrar os dados
+
     const filteredData = filterData(data, filters);
-    
-    // Calcular a força com base no modo selecionado
+
     let strengthFunction;
     let strengthLabel;
     
@@ -22,30 +15,25 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
         strengthLabel = 'Força Defensiva';
     }
     
-    // Adicionar a força calculada aos dados
     const dataWithStrength = filteredData.map(d => ({
         ...d,
         strength: strengthFunction(d)
     }));
     
-    // Ordenar e pegar os top 10
     const topPokemon = dataWithStrength
         .sort((a, b) => b.strength - a.strength)
         .slice(0, 10);
-    
-    // Configurar dimensões
+
     const margin = {top: 30, right: 30, bottom: 70, left: 150};
     const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
     const height = container.node().getBoundingClientRect().height - margin.top - margin.bottom;
-    
-    // Criar SVG
+
     const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
-    
-    // Criar escalas
+
     const x = d3.scaleLinear()
         .domain([0, d3.max(topPokemon, d => d.strength)])
         .range([0, width]);
@@ -58,27 +46,23 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
     const color = d3.scaleOrdinal()
         .domain(topPokemon.map(d => d.type_1))
         .range(topPokemon.map(d => getTypeColor(d.type_1)));
-    
-    // Criar eixos
+
     svg.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x));
     
     svg.append('g')
         .call(d3.axisLeft(y));
-    
-    // Adicionar título dos eixos
+
     svg.append('text')
         .attr('class', 'axis-title')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2)
         .attr('y', height + margin.bottom - 30)
         .text(strengthLabel);
-    
-    // Criar tooltip
+
     const tooltip = createTooltip();
-    
-    // Criar barras
+
     svg.selectAll('.bar')
         .data(topPokemon)
         .enter()
@@ -103,8 +87,7 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
             `, event);
         })
         .on('mouseout', () => hideTooltip(tooltip));
-    
-    // Adicionar rótulos nas barras
+
     svg.selectAll('.bar-label')
         .data(topPokemon)
         .enter()
@@ -116,7 +99,6 @@ function createTopPokemonChart(data, filters, mode = 'offensive') {
         .text(d => d.strength);
 }
 
-// Configurar os botões de alternância
 function setupTopPokemonButtons(data, filters) {
     document.getElementById('offensive-btn').addEventListener('click', function() {
         document.getElementById('offensive-btn').classList.add('active');
