@@ -11,7 +11,6 @@ function updateAllCharts(data) {
     createCatchRateChart(data, filters);
     createTypeCombinationsChart(data, filters);
     createStatusDistributionChart(data, filters);
-    createGenderChart(data, filters);
     createStrongestPokemonChart(data, filters);
 }
 
